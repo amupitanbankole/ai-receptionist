@@ -111,7 +111,7 @@ class AppointmentService
             'metadata' => $data['metadata'] ?? null,
         ]);
 
-        $config = $company->receptionistConfig;
+        \App\Models\Activity::create([\n            'company_id' => $company->id,\n            'contact_id' => $appointment->contact_id,\n            'lead_id' => $appointment->lead_id,\n            'type' => 'appointment_booked',\n            'subject' => 'Appointment booked',\n            'description' => $appointment->customer_name.' booked '.$type->name.' for '.$appointment->starts_at->format('Y-m-d H:i'),\n            'occurred_at' => now(),\n        ]);\n\n        $config = $company->receptionistConfig;
         if ($config?->notification_email) {
             Mail::raw(
                 "New appointment for {$company->name}\n\nCustomer: {$appointment->customer_name}\nEmail: ".($appointment->customer_email ?: 'Not provided')."\nPhone: ".($appointment->customer_phone ?: 'Not provided')."\nWhen: ".$appointment->starts_at->format('l j F Y H:i')."\nType: ".$type->name,
