@@ -12,7 +12,8 @@ class Message extends Model
     use HasFactory;
 
     protected $fillable = [
-        'campaign_recipient_id','direction','channel','to_address','from_address','reply_to',
+        'campaign_recipient_id','conversation_id','lead_id','company_id','contact_id',
+        'direction','channel','to_address','from_address','reply_to',
         'subject','body','status','provider_message_id','sent_at','metadata',
     ];
 
@@ -22,5 +23,9 @@ class Message extends Model
     ];
 
     public function recipient(): BelongsTo { return $this->belongsTo(CampaignRecipient::class, 'campaign_recipient_id'); }
+    public function conversation(): BelongsTo { return $this->belongsTo(SalesConversation::class, 'conversation_id'); }
+    public function lead(): BelongsTo { return $this->belongsTo(Lead::class); }
+    public function company(): BelongsTo { return $this->belongsTo(Company::class); }
+    public function contact(): BelongsTo { return $this->belongsTo(Contact::class); }
     public function events(): HasMany { return $this->hasMany(MessageEvent::class); }
 }
