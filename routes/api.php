@@ -6,4 +6,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/webhooks/inbound-email', [SalesConversationController::class, 'webhook'])
     ->name('api.sales-conversations.webhook');
-\nRoute::post('/receptionist/message', [ReceptionistController::class, 'webhook'])\n    ->name('api.receptionist.webhook');\n
+
+Route::post('/receptionist/message', [ReceptionistController::class, 'webhook'])
+    ->name('api.receptionist.webhook');
