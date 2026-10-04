@@ -6,7 +6,6 @@ use App\Models\Company;
 use App\Models\DiscoveryResult;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -52,10 +51,9 @@ class DiscoveryResultController extends Controller
         $file = $request->file('file');
         $handle = fopen($file->getRealPath(), 'r');
         $headers = array_map(fn ($value) => strtolower(trim($value)), fgetcsv($handle) ?: []);
-        $required = ['company_name','website','phone','email','industry','city','county','postcode','country','source','source_url','discovery_notes'];
-
         while (($row = fgetcsv($handle)) !== false) {
-            $data = array_pad(array_combine($headers, array_pad($row, count($headers), null)) ?: [], count($headers), null);
+            $row = array_pad($row, count($headers), null);
+            $data = array_combine($headers, $row) ?: [];
             if (!empty($data['company_name'])) {
                 DiscoveryResult::create([
                     'company_name' => trim($data['company_name']),
