@@ -4,7 +4,7 @@
 @section('content')
 <div class="d-flex justify-content-between mb-4"><div><h2>{{ $company->name }}</h2><p class="text-muted">Receptionist configuration, knowledge, booking and availability.</p></div><a href="{{ route('receptionist.dashboard',['company_id'=>$company->id]) }}" class="btn btn-outline-secondary">Dashboard</a></div>
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-<div class="card mb-4"><div class="card-header fw-bold">Receptionist settings</div><div class="card-body"><form method="POST" action="{{ route('receptionist.update',$company) }}">@csrf @method('PUT')
+<div class="card mb-4"><div class="card-header fw-bold">Receptionist settings</div><div class="card-body"><form method="POST" action="{{ route('receptionist.update',$company) }}">@csrf @method('PUT')<textarea name="allowed_origins" class="d-none">{{ implode("\n",$serviceOrigins) }}</textarea>
 <div class="row g-3">
 <div class="col-md-6"><label class="form-label">Display name</label><input name="display_name" class="form-control" value="{{ old('display_name',$config->display_name) }}"></div>
 <div class="col-md-3"><label class="form-label">Tone</label><select name="tone" class="form-select">@foreach(['professional','friendly','concise','warm'] as $tone)<option value="{{ $tone }}" @selected($config->tone===$tone)>{{ ucfirst($tone) }}</option>@endforeach</select></div>
