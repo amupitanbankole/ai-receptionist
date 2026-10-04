@@ -28,16 +28,46 @@
 </div>
 
 <div class="card mt-4">
-    <div class="card-header fw-bold">Website chat widget</div>
+    <div class="card-header fw-bold">Widget security & embed</div>
     <div class="card-body">
-        <p class="text-muted mb-3">Add this snippet to any website page, just before the closing <code>&lt;/body&gt;</code> tag. It opens a floating AI receptionist chat for {{ $company->name }}.</p>
+        <p class="small text-muted">For production, list the exact website origins that are allowed to use this widget. Example: <code>https://www.example.co.uk</code>. Use one origin per line. Do not include a path such as <code>/contact</code>.</p>
+        <form method="POST" action="{{ route('receptionist.update',$company) }}" class="mb-4">
+            @csrf @method('PUT')
+            <input type="hidden" name="tone" value="{{ $config->tone }}">
+            <input type="hidden" name="display_name" value="{{ $config->display_name }}">
+            <input type="hidden" name="greeting" value="{{ $config->greeting }}">
+            <input type="hidden" name="instructions" value="{{ $config->instructions }}">
+            <input type="hidden" name="timezone" value="{{ $config->timezone }}">
+            <input type="hidden" name="enabled" value="{{ $config->enabled ? 1 : 0 }}">
+            <input type="hidden" name="booking_enabled" value="{{ $config->booking_enabled ? 1 : 0 }}">
+            <textarea name="services" class="d-none">{{ implode("\n",$config->services ?? []) }}</textarea>
+            <textarea name="service_areas" class="d-none">{{ implode("\n",$config->service_areas ?? []) }}</textarea>
+            <textarea name="business_hours" class="d-none">{{ implode("\n",$config->business_hours ?? []) }}</textarea>
+            <textarea name="after_hours_message" class="d-none">{{ $config->after_hours_message }}</textarea>
+            <input type="hidden" name="notification_email" value="{{ $config->notification_email }}">
+            <input type="hidden" name="escalation_email" value="{{ $config->escalation_email }}">
+            <input type="hidden" name="escalation_phone" value="{{ $config->escalation_phone }}">
+            <label class="form-label">Allowed origins</label>
+            <textarea name="allowed_origins" class="form-control font-monospace" rows="4" placeholder="https://www.example.co.uk&#10;https://example.co.uk">{{ implode("\n",$serviceOrigins) }}</textarea>
+            <button class="btn btn-outline-primary mt-2">Save allowed origins</button>
+        </form>
+        <div class="mb-4">
+            <label class="form-label">Public widget key</label>
+            <div class="input-group">
+                <input class="form-control font-monospace" value="{{ $widgetKey }}" readonly>
+                <button type="button" class="btn btn-outline-secondary" onclick="navigator.clipboard.writeText(this.previousElementSibling.value).then(()=>{this.textContent='Copied';setTimeout(()=>this.textContent='Copy',1500)})">Copy</button>
+            </div>
+            <form method="POST" action="{{ route('receptionist.widget-key.regenerate',$company) }}" class="mt-2" onsubmit="return confirm('Regenerate the widget key? Existing embeds will stop working until replaced.');">
+                @csrf
+                <button class="btn btn-sm btn-outline-danger">Regenerate key</button>
+            </form>
+        </div>
+        <p class="text-muted mb-2">Embed this snippet just before <code>&lt;/body&gt;</code> on an authorized website:</p>
         <div class="input-group">
-            <textarea id="receptionist-widget-code" class="form-control font-monospace" rows="3" readonly>&lt;script src="{{ url('/receptionist-widget.js') }}?company_id={{ $company->id }}" defer&gt;&lt;/script&gt;</textarea>
+            <textarea id="receptionist-widget-code" class="form-control font-monospace" rows="3" readonly>&lt;script src="{{ url('/receptionist-widget.js') }}?company_id={{ $company->id }}&amp;site_key={{ $widgetKey }}" defer&gt;&lt;/script&gt;</textarea>
             <button type="button" class="btn btn-outline-primary" onclick="navigator.clipboard.writeText(document.getElementById('receptionist-widget-code').value).then(() => { this.textContent='Copied'; setTimeout(() => this.textContent='Copy', 1500); })">Copy</button>
         </div>
-        <div class="mt-3 small text-muted">
-            The widget sends customer messages to the AI receptionist, creates/updates the CRM conversation and lead, and can request appointment bookings.
-        </div>
+        <div class="mt-3 small text-muted">The widget now validates its public key, calling website origin, rate limit and API availability before processing chat.</div>
     </div>
 </div>
 
