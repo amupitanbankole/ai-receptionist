@@ -75,6 +75,9 @@ class CampaignService
 
     public function dispatchDue(Campaign $campaign): int
     {
+        if ($campaign->status !== 'active' || ($campaign->scheduled_at && $campaign->scheduled_at->isFuture())) {
+            return 0;
+        }
         $limit = max(1, (int) $campaign->daily_limit);
         $sentToday = $campaign->recipients()->whereDate('sent_at', today())->count();
         $remaining = max(0, $limit - $sentToday);
