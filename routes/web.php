@@ -47,6 +47,7 @@ Route::post('/ai-personalization/{personalization}/use-campaign', [AiPersonaliza
 Route::get('/receptionist', [ReceptionistController::class, 'dashboard'])->name('receptionist.dashboard');
 Route::get('/companies/{company}/receptionist', [ReceptionistController::class, 'edit'])->name('receptionist.edit');
 Route::put('/companies/{company}/receptionist', [ReceptionistController::class, 'update'])->name('receptionist.update');
+Route::post('/companies/{company}/receptionist/widget-key/regenerate', [ReceptionistController::class, 'regenerateWidgetKey'])->name('receptionist.widget-key.regenerate');
 Route::post('/companies/{company}/receptionist/knowledge', [ReceptionistController::class, 'storeKnowledge'])->name('receptionist.knowledge.store');
 Route::delete('/companies/{company}/receptionist/knowledge/{knowledge}', [ReceptionistController::class, 'destroyKnowledge'])->name('receptionist.knowledge.destroy');
 Route::post('/companies/{company}/receptionist/appointment-types', [ReceptionistController::class, 'storeType'])->name('receptionist.types.store');
