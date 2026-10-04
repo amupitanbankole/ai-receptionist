@@ -53,6 +53,7 @@ class CompanyController extends Controller
 
     public function show(Company $company): View
     {
+        $company->load(['intelligence','contacts','leads','activities']);
         return view('companies.show', compact('company'));
     }
 
