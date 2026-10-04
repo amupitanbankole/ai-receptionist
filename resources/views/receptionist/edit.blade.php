@@ -26,4 +26,19 @@
 <div class="col-lg-6"><div class="card mb-4"><div class="card-header fw-bold">Appointment types</div><div class="card-body"><form method="POST" action="{{ route('receptionist.types.store',$company) }}">@csrf<div class="row g-2"><div class="col-7"><input name="name" class="form-control" placeholder="Consultation"></div><div class="col-5"><input name="duration_minutes" type="number" class="form-control" value="30"></div><div class="col-12"><input name="description" class="form-control" placeholder="Description"></div><div class="col-5"><input name="buffer_minutes" type="number" class="form-control" value="0"></div><div class="col-7"><button class="btn btn-outline-primary">Add type</button></div></div></form><hr>@foreach($types as $type)<div class="d-flex justify-content-between border-bottom py-2"><span>{{ $type->name }}</span><span>{{ $type->duration_minutes }} min</span></div>@endforeach</div></div>
 <div class="card"><div class="card-header fw-bold">Availability windows</div><div class="card-body"><form method="POST" action="{{ route('receptionist.availability.store',$company) }}">@csrf<div class="row g-2"><div class="col-4"><select name="day_of_week" class="form-select">@foreach(['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'] as $i=>$day)<option value="{{ $i }}">{{ $day }}</option>@endforeach</select></div><div class="col-3"><input name="start_time" type="time" class="form-control" value="09:00"></div><div class="col-3"><input name="end_time" type="time" class="form-control" value="17:00"></div><div class="col-2"><button class="btn btn-outline-primary">Add</button></div></div></form><hr>@foreach($availability as $window)<div class="d-flex justify-content-between border-bottom py-2"><span>{{ ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][$window->day_of_week] }}</span><span>{{ substr($window->start_time,0,5) }} - {{ substr($window->end_time,0,5) }}</span></div>@endforeach</div></div></div>
 </div>
+
+<div class="card mt-4">
+    <div class="card-header fw-bold">Website chat widget</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">Add this snippet to any website page, just before the closing <code>&lt;/body&gt;</code> tag. It opens a floating AI receptionist chat for {{ $company->name }}.</p>
+        <div class="input-group">
+            <textarea id="receptionist-widget-code" class="form-control font-monospace" rows="3" readonly>&lt;script src="{{ url('/receptionist-widget.js') }}?company_id={{ $company->id }}" defer&gt;&lt;/script&gt;</textarea>
+            <button type="button" class="btn btn-outline-primary" onclick="navigator.clipboard.writeText(document.getElementById('receptionist-widget-code').value).then(() => { this.textContent='Copied'; setTimeout(() => this.textContent='Copy', 1500); })">Copy</button>
+        </div>
+        <div class="mt-3 small text-muted">
+            The widget sends customer messages to the AI receptionist, creates/updates the CRM conversation and lead, and can request appointment bookings.
+        </div>
+    </div>
+</div>
+
 @endsection
