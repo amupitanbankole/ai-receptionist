@@ -25,6 +25,7 @@ Route::patch('/followups/{followup}/complete', [FollowupController::class, 'comp
 
 
 Route::resource('discovery', \App\Http\Controllers\DiscoveryResultController::class)->only(['index','create','store']);
+Route::post('/discovery/import', [\App\Http\Controllers\DiscoveryResultController::class, 'import'])->name('discovery.import');
 Route::post('/discovery/{result}/promote', [\App\Http\Controllers\DiscoveryResultController::class, 'promote'])->name('discovery.promote');
 Route::patch('/discovery/{result}/discard', [\App\Http\Controllers\DiscoveryResultController::class, 'discard'])->name('discovery.discard');
 Route::get('/companies/{company}/research', [\App\Http\Controllers\CompanyResearchController::class, 'show'])->name('research.show');
