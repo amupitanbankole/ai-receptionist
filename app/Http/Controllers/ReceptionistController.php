@@ -34,7 +34,9 @@ class ReceptionistController extends Controller
         $knowledge = $company->receptionistKnowledge()->orderByDesc('priority')->get();
         $types = $company->appointmentTypes()->orderBy('id')->get();
         $availability = $company->availability()->orderBy('day_of_week')->orderBy('start_time')->get();
-        return view('receptionist.edit', compact('company','config','knowledge','types','availability'));
+        $serviceOrigins = $service->allowedWidgetOrigins($config);
+        $widgetKey = $service->widgetKey($config);
+        return view('receptionist.edit', compact('company','config','knowledge','types','availability','serviceOrigins','widgetKey'));
     }
 
     public function update(Request $request, Company $company, ReceptionistService $service)
@@ -54,17 +56,29 @@ class ReceptionistController extends Controller
             'escalation_email' => ['nullable','email','max:255'],
             'notification_email' => ['nullable','email','max:255'],
             'timezone' => ['required','timezone'],
+            'allowed_origins' => ['nullable','string','max:5000'],
         ]);
 
         foreach (['services','service_areas','business_hours'] as $key) {
             $data[$key] = $this->lines($data[$key] ?? '');
         }
 
+        $allowedOrigins = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $data['allowed_origins'] ?? ''))));
+        unset($data['allowed_origins']);
         $config = $service->ensureConfig($company);
+        $metadata = is_array($config->metadata) ? $config->metadata : [];
+        $metadata['allowed_origins'] = $allowedOrigins;
+        $data['metadata'] = $metadata;
         $config->update($data);
         $service->ensureConfig($company);
 
         return back()->with('success', 'AI receptionist configuration saved.');
+    }
+
+    public function regenerateWidgetKey(Company $company, ReceptionistService $service)
+    {
+        $service->regenerateWidgetKey($company);
+        return back()->with('success', 'Widget key regenerated. Replace existing website snippets.');
     }
 
     public function storeKnowledge(Request $request, Company $company)
