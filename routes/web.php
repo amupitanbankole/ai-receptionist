@@ -13,6 +13,9 @@ use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\CampaignUnsubscribeController;
 use App\Http\Controllers\SalesConversationController;
+use App\Http\Controllers\ReceptionistController;
+use App\Http\Controllers\ReceptionistSimulationController;
+use App\Http\Controllers\AppointmentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -40,6 +43,22 @@ Route::patch('/companies/{company}/research', [\App\Http\Controllers\CompanyRese
 Route::get('/leads/{lead}/ai-personalization', [AiPersonalizationController::class, 'show'])->name('ai-personalization.show');
 Route::post('/leads/{lead}/ai-personalization/generate', [AiPersonalizationController::class, 'generate'])->name('ai-personalization.generate');
 Route::post('/ai-personalization/{personalization}/use-campaign', [AiPersonalizationController::class, 'useAsCampaignDraft'])->name('ai-personalization.use-campaign');
+
+Route::get('/receptionist', [ReceptionistController::class, 'dashboard'])->name('receptionist.dashboard');
+Route::get('/companies/{company}/receptionist', [ReceptionistController::class, 'edit'])->name('receptionist.edit');
+Route::put('/companies/{company}/receptionist', [ReceptionistController::class, 'update'])->name('receptionist.update');
+Route::post('/companies/{company}/receptionist/knowledge', [ReceptionistController::class, 'storeKnowledge'])->name('receptionist.knowledge.store');
+Route::delete('/companies/{company}/receptionist/knowledge/{knowledge}', [ReceptionistController::class, 'destroyKnowledge'])->name('receptionist.knowledge.destroy');
+Route::post('/companies/{company}/receptionist/appointment-types', [ReceptionistController::class, 'storeType'])->name('receptionist.types.store');
+Route::post('/companies/{company}/receptionist/availability', [ReceptionistController::class, 'storeAvailability'])->name('receptionist.availability.store');
+
+Route::get('/receptionist/simulate', [ReceptionistSimulationController::class, 'show'])->name('receptionist.simulate');
+Route::post('/receptionist/simulate', [ReceptionistSimulationController::class, 'store'])->name('receptionist.simulate.store');
+
+Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
+Route::get('/appointments/create', [AppointmentController::class, 'create'])->name('appointments.create');
+Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'status'])->name('appointments.status');
 
 Route::get('/sales-conversations', [SalesConversationController::class, 'index'])->name('sales-conversations.index');
 Route::get('/sales-conversations/simulate', [SalesConversationController::class, 'simulate'])->name('sales-conversations.simulate');
