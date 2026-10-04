@@ -21,7 +21,7 @@
     @foreach([
         ['Draft', 'draft'], ['Active', 'active'], ['Paused', 'paused'], ['Completed', 'completed']
     ] as [$label,$status])
-        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">{{ $label }}</div><div class="fs-3 fw-bold">{{ AppModelsCampaign::where('status',$status)->count() }}</div></div></div></div>
+        <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">{{ $label }}</div><div class="fs-3 fw-bold">{{ \App\Models\Campaign::where('status',$status)->count() }}</div></div></div></div>
     @endforeach
 </div>
 
