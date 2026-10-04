@@ -22,3 +22,11 @@ Route::patch('/lead-scoring/companies/{company}/signals', [LeadScoringController
 Route::resource('activities', ActivityController::class)->only(['index','create','store']);
 Route::resource('followups', FollowupController::class)->only(['index','create','store']);
 Route::patch('/followups/{followup}/complete', [FollowupController::class, 'complete'])->name('followups.complete');
+
+
+Route::resource('discovery', \App\Http\Controllers\DiscoveryResultController::class)->only(['index','create','store']);
+Route::post('/discovery/{result}/promote', [\App\Http\Controllers\DiscoveryResultController::class, 'promote'])->name('discovery.promote');
+Route::patch('/discovery/{result}/discard', [\App\Http\Controllers\DiscoveryResultController::class, 'discard'])->name('discovery.discard');
+Route::get('/companies/{company}/research', [\App\Http\Controllers\CompanyResearchController::class, 'show'])->name('research.show');
+Route::post('/companies/{company}/research', [\App\Http\Controllers\CompanyResearchController::class, 'run'])->name('research.run');
+Route::patch('/companies/{company}/research', [\App\Http\Controllers\CompanyResearchController::class, 'update'])->name('research.update');
