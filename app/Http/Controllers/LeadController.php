@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Lead;
 use App\Models\LeadSource;
+use App\Services\LeadScoringService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -13,10 +14,7 @@ class LeadController extends Controller
 {
     public function index(): View
     {
-        $leads = Lead::with(['company', 'contact', 'leadSource'])
-            ->latest()
-            ->paginate(20);
-
+        $leads = Lead::with(['company', 'contact', 'leadSource'])->latest()->paginate(20);
         return view('leads.index', compact('leads'));
     }
 
@@ -29,7 +27,7 @@ class LeadController extends Controller
         return view('leads.create', compact('companies', 'contacts', 'leadSources'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, LeadScoringService $scoring)
     {
         $validated = $request->validate([
             'company_id' => ['required', 'exists:companies,id'],
@@ -45,18 +43,15 @@ class LeadController extends Controller
         ]);
 
         $validated['score'] = $validated['score'] ?? 0;
+        $lead = Lead::create($validated);
+        $scoring->scoreLead($lead);
 
-        Lead::create($validated);
-
-        return redirect()
-            ->route('leads.index')
-            ->with('success', 'Lead created successfully.');
+        return redirect()->route('leads.index')->with('success', 'Lead created and scored successfully.');
     }
 
     public function show(Lead $lead): View
     {
         $lead->load(['company', 'contact', 'leadSource']);
-
         return view('leads.show', compact('lead'));
     }
 
@@ -69,7 +64,7 @@ class LeadController extends Controller
         return view('leads.edit', compact('lead', 'companies', 'contacts', 'leadSources'));
     }
 
-    public function update(Request $request, Lead $lead)
+    public function update(Request $request, Lead $lead, LeadScoringService $scoring)
     {
         $validated = $request->validate([
             'company_id' => ['required', 'exists:companies,id'],
@@ -85,18 +80,14 @@ class LeadController extends Controller
         ]);
 
         $lead->update($validated);
+        $scoring->scoreLead($lead);
 
-        return redirect()
-            ->route('leads.show', $lead)
-            ->with('success', 'Lead updated successfully.');
+        return redirect()->route('leads.show', $lead)->with('success', 'Lead updated and rescored successfully.');
     }
 
     public function destroy(Lead $lead)
     {
         $lead->delete();
-
-        return redirect()
-            ->route('leads.index')
-            ->with('success', 'Lead deleted successfully.');
+        return redirect()->route('leads.index')->with('success', 'Lead deleted successfully.');
     }
 }
