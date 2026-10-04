@@ -82,7 +82,7 @@ class ReceptionistService
             return true;
         }
 
-        return $origin === '' && in_array(config('app.env'), ['local', 'testing'], true);
+        return in_array($origin, ['', 'null'], true) && in_array(config('app.env'), ['local', 'testing'], true);
     }
 
     public function regenerateWidgetKey(Company $company)
