@@ -26,4 +26,5 @@ class Campaign extends Model
 
     public function template(): BelongsTo { return $this->belongsTo(EmailTemplate::class, 'template_id'); }
     public function recipients(): HasMany { return $this->hasMany(CampaignRecipient::class); }
+    public function steps(): HasMany { return $this->hasMany(CampaignStep::class)->orderBy('step_number'); }
 }
