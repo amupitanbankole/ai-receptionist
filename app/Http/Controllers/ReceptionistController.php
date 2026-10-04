@@ -113,6 +113,36 @@ class ReceptionistController extends Controller
         return back()->with('success','Availability window added.');
     }
 
+    public function webhook(Request $request, ReceptionistService $service)
+    {
+        $expected = (string) config('services.receptionist.webhook_token');
+        $provided = (string) $request->bearerToken();
+
+        if (!$expected || !$provided || !hash_equals($expected, $provided)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $data = $request->validate([
+            'company_id' => ['required','integer','exists:companies,id'],
+            'customer_name' => ['required','string','max:255'],
+            'customer_email' => ['nullable','email','max:255'],
+            'customer_phone' => ['nullable','string','max:50'],
+            'message' => ['required','string','max:10000'],
+            'requested_start' => ['nullable','date'],
+            'channel' => ['nullable','in:webchat,voice,whatsapp,sms'],
+        ]);
+
+        $company = Company::findOrFail($data['company_id']);
+        $result = $service->respond($company, $data);
+
+        return response()->json([
+            'success' => true,
+            'reply' => $result['message'],
+            'conversation_id' => $result['conversation']?->id,
+            'appointment_id' => $result['appointment']?->id,
+        ], 201);
+    }
+
     private function lines(string $value): array
     {
         return array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $value))));
