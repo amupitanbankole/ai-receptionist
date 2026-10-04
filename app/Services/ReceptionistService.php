@@ -85,38 +85,6 @@ class ReceptionistService
         return in_array($origin, ['', 'null'], true) && in_array(config('app.env'), ['local', 'testing'], true);
     }
 
-    public function regenerateWidgetKey(Company $company)
-    {
-        $config = $this->ensureConfig($company);
-        $metadata = is_array($config->metadata) ? $config->metadata : [];
-        $metadata['widget_key'] = Str::random(40);
-        $config->metadata = $metadata;
-        $config->save();
-        return $config->fresh();
-    }
-
-    public function widgetKey($config): string
-    {
-        return (string) (($config->metadata ?? [])['widget_key'] ?? '');
-    }
-
-    public function allowedWidgetOrigins($config): array
-    {
-        $origins = (($config->metadata ?? [])['allowed_origins'] ?? []);
-        if (!is_array($origins)) return [];
-        return array_values(array_filter(array_map(function ($origin) {
-            $origin = trim((string) $origin);
-            return $origin === '' ? null : rtrim($origin, '/');
-        }, $origins)));
-    }
-
-    public function isWidgetOriginAllowed($config, ?string $origin): bool
-    {
-        $origin = $origin ? rtrim(trim($origin), '/') : '';
-        if ($origin !== '' && in_array($origin, $this->allowedWidgetOrigins($config), true)) return true;
-        return $origin === '' && in_array(config('app.env'), ['local', 'testing'], true);
-    }
-
     public function respond(Company $company, array $input): array
     {
         $config = $this->ensureConfig($company);
