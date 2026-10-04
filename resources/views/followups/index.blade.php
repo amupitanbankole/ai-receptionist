@@ -1,0 +1,8 @@
+@extends('layouts.app')
+@section('title','Follow-ups | AI Receptionist')
+@section('page_title','Follow-ups')
+@section('content')
+<div class="container-fluid"><div class="d-flex justify-content-between align-items-center mb-4"><div><h2 class="fw-bold mb-1">Follow-ups</h2><p class="text-muted mb-0">Manage the next actions for your sales pipeline.</p></div><a href="{{ route('followups.create') }}" class="btn btn-dark">+ Schedule Follow-up</a></div>
+@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+<div class="card border-0 shadow-sm"><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th class="px-4">Follow-up</th><th>Lead</th><th>Company</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody>@forelse($followups as $followup)<tr><td class="px-4"><strong>{{ $followup->subject }}</strong><br><small class="text-muted">{{ ucfirst($followup->type) }}</small></td><td>{{ $followup->lead->title }}</td><td>{{ $followup->lead->company->name }}</td><td>{{ $followup->due_at->format('d M Y H:i') }}</td><td><span class="badge {{ $followup->status === 'completed' ? 'text-bg-success' : 'text-bg-warning' }}">{{ ucfirst($followup->status) }}</span></td><td>@if($followup->status === 'pending')<form method="POST" action="{{ route('followups.complete',$followup) }}">@csrf @method('PATCH')<button class="btn btn-sm btn-outline-success">Complete</button></form>@endif</td></tr>@empty<tr><td colspan="6" class="text-center py-5 text-muted">No follow-ups scheduled.</td></tr>@endforelse</tbody></table></div><div class="p-3">{{ $followups->links() }}</div></div></div>
+@endsection
