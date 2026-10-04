@@ -52,6 +52,12 @@
         <div class="d-flex gap-2">
 
             <a
+                href="{{ route('research.show', $company) }}"
+                class="btn btn-dark">
+                Research
+            </a>
+
+            <a
                 href="{{ route('companies.edit', $company) }}"
                 class="btn btn-outline-dark">
                 Edit Company
@@ -110,11 +116,11 @@
                     </p>
 
                     <h2 class="fw-bold mb-0">
-                        0
+                        {{ $company->contacts->count() }}
                     </h2>
 
                     <small class="text-muted">
-                        Contacts will appear here
+                        CRM contacts
                     </small>
 
                 </div>
@@ -134,11 +140,11 @@
                     </p>
 
                     <h2 class="fw-bold mb-0">
-                        0
+                        {{ $company->leads->count() }}
                     </h2>
 
                     <small class="text-muted">
-                        Outreach history
+                        Leads in pipeline
                     </small>
 
                 </div>
@@ -158,11 +164,11 @@
                     </p>
 
                     <h2 class="fw-bold mb-0">
-                        0
+                        {{ $company->activities->count() }}
                     </h2>
 
                     <small class="text-muted">
-                        Bookings
+                        Recorded activities
                     </small>
 
                 </div>
@@ -315,13 +321,8 @@
 
                     <div class="d-flex justify-content-between align-items-center">
 
-                        <h5 class="fw-bold mb-0">
-                            AI Sales Intelligence
-                        </h5>
-
-                        <span class="badge bg-light text-dark">
-                            Coming Next
-                        </span>
+                        <h5 class="fw-bold mb-0">AI Sales Intelligence</h5>
+                        <a href="{{ route('research.show', $company) }}" class="btn btn-sm btn-outline-dark">Open Research</a>
 
                     </div>
 
@@ -340,8 +341,7 @@
                                 </h6>
 
                                 <p class="text-muted small mb-0">
-                                    Automatically evaluate this company's
-                                    likelihood of becoming a customer.
+                                    Current score: {{ $company->lead_score }}/100. Scoring signals are managed in Lead Scoring.
                                 </p>
 
                             </div>
@@ -357,8 +357,8 @@
                                 </h6>
 
                                 <p class="text-muted small mb-0">
-                                    AI will analyse the company's website,
-                                    services, booking process and sales opportunities.
+                                    Research status: {{ ucfirst($company->intelligence?->research_status ?? 'pending') }}.
+                                    @if($company->intelligence?->researched_at) Last run {{ $company->intelligence->researched_at->format('d M Y H:i') }}. @endif
                                 </p>
 
                             </div>
