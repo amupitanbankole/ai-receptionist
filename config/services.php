@@ -19,6 +19,10 @@ return [
         'webhook_token' => env('SALES_INBOUND_WEBHOOK_TOKEN'),
     ],
 
+    'receptionist' => [
+        'webhook_token' => env('RECEPTIONIST_WEBHOOK_TOKEN'),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
