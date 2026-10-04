@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\DiscoveryResult;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -42,6 +43,40 @@ class DiscoveryResultController extends Controller
         DiscoveryResult::create($validated);
 
         return redirect()->route('discovery.index')->with('success','Prospect added to discovery queue.');
+    }
+
+    public function import(Request $request): RedirectResponse
+    {
+        $request->validate(['file' => ['required','file','mimes:csv,txt','max:2048']]);
+
+        $file = $request->file('file');
+        $handle = fopen($file->getRealPath(), 'r');
+        $headers = array_map(fn ($value) => strtolower(trim($value)), fgetcsv($handle) ?: []);
+        $required = ['company_name','website','phone','email','industry','city','county','postcode','country','source','source_url','discovery_notes'];
+
+        while (($row = fgetcsv($handle)) !== false) {
+            $data = array_pad(array_combine($headers, array_pad($row, count($headers), null)) ?: [], count($headers), null);
+            if (!empty($data['company_name'])) {
+                DiscoveryResult::create([
+                    'company_name' => trim($data['company_name']),
+                    'website' => $data['website'] ?: null,
+                    'phone' => $data['phone'] ?: null,
+                    'email' => $data['email'] ?: null,
+                    'industry' => $data['industry'] ?: null,
+                    'city' => $data['city'] ?: null,
+                    'county' => $data['county'] ?: null,
+                    'postcode' => $data['postcode'] ?: null,
+                    'country' => $data['country'] ?: 'United Kingdom',
+                    'source' => $data['source'] ?: 'Import',
+                    'source_url' => $data['source_url'] ?: null,
+                    'discovery_notes' => $data['discovery_notes'] ?: null,
+                ]);
+            }
+        }
+
+        fclose($handle);
+
+        return back()->with('success', 'CSV prospects imported successfully.');
     }
 
     public function promote(DiscoveryResult $result): RedirectResponse
