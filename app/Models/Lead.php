@@ -26,4 +26,5 @@ class Lead extends Model
     public function activities(): HasMany { return $this->hasMany(Activity::class); }
     public function followups(): HasMany { return $this->hasMany(Followup::class); }
     public function aiPersonalizations(): HasMany { return $this->hasMany(AiPersonalization::class); }
+    public function salesConversations(): HasMany { return $this->hasMany(SalesConversation::class); }
 }
