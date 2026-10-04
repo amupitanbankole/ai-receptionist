@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -37,4 +37,9 @@ class Company extends Model
         'business_hours' => 'array',
         'lead_score' => 'integer',
     ];
+
+    public function contacts(): HasMany
+{
+    return $this->hasMany(Contact::class);
+}
 }

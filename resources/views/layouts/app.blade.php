@@ -34,12 +34,11 @@
                 Sales
             </div>
 
-            <a href="#" class="nav-link text-white">
+            <a href="{{ route('companies.index') }}" class="nav-link">
                 Companies
             </a>
 
-            <a href="#" class="nav-link text-white">
-                Contacts
+<a href="{{ route('contacts.index') }}" class="nav-link">                Contacts
             </a>
 
             <a href="#" class="nav-link text-white">
