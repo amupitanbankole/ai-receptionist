@@ -41,7 +41,7 @@
 <a href="{{ route('contacts.index') }}" class="nav-link">                Contacts
             </a>
 
-            <a href="#" class="nav-link text-white">
+            <a href="{{ route('leads.index') }}" class="nav-link text-white">
                 Leads
             </a>
 
