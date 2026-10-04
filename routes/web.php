@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\AiPersonalizationController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
@@ -27,7 +28,6 @@ Route::resource('activities', ActivityController::class)->only(['index','create'
 Route::resource('followups', FollowupController::class)->only(['index','create','store']);
 Route::patch('/followups/{followup}/complete', [FollowupController::class, 'complete'])->name('followups.complete');
 
-
 Route::resource('discovery', \App\Http\Controllers\DiscoveryResultController::class)->only(['index','create','store']);
 Route::post('/discovery/import', [\App\Http\Controllers\DiscoveryResultController::class, 'import'])->name('discovery.import');
 Route::post('/discovery/{result}/promote', [\App\Http\Controllers\DiscoveryResultController::class, 'promote'])->name('discovery.promote');
@@ -35,6 +35,10 @@ Route::patch('/discovery/{result}/discard', [\App\Http\Controllers\DiscoveryResu
 Route::get('/companies/{company}/research', [\App\Http\Controllers\CompanyResearchController::class, 'show'])->name('research.show');
 Route::post('/companies/{company}/research', [\App\Http\Controllers\CompanyResearchController::class, 'run'])->name('research.run');
 Route::patch('/companies/{company}/research', [\App\Http\Controllers\CompanyResearchController::class, 'update'])->name('research.update');
+
+Route::get('/leads/{lead}/ai-personalization', [AiPersonalizationController::class, 'show'])->name('ai-personalization.show');
+Route::post('/leads/{lead}/ai-personalization/generate', [AiPersonalizationController::class, 'generate'])->name('ai-personalization.generate');
+Route::post('/ai-personalization/{personalization}/use-campaign', [AiPersonalizationController::class, 'useAsCampaignDraft'])->name('ai-personalization.use-campaign');
 
 Route::resource('campaigns', CampaignController::class)->only(['index','create','store','show']);
 Route::post('/campaigns/{campaign}/launch', [CampaignController::class, 'launch'])->name('campaigns.launch');
