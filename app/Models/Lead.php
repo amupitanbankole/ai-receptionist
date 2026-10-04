@@ -13,6 +13,7 @@ class Lead extends Model
     protected $fillable = [
         'company_id',
         'contact_id',
+        'lead_source_id',
         'title',
         'status',
         'score',
@@ -35,5 +36,10 @@ class Lead extends Model
     public function contact(): BelongsTo
     {
         return $this->belongsTo(Contact::class);
+    }
+
+    public function leadSource(): BelongsTo
+    {
+        return $this->belongsTo(LeadSource::class);
     }
 }
