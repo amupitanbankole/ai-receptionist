@@ -24,6 +24,9 @@
             <a href="{{ route('campaigns.index') }}" class="nav-link text-white">Campaigns</a>
             <a href="{{ route('messages.index') }}" class="nav-link text-white">Messages</a>
             <a href="{{ route('sales-conversations.index') }}" class="nav-link text-white">AI Sales Conversations</a>
+            <div class="text-uppercase text-secondary small fw-bold mt-3 mb-1">Receptionist</div>
+            <a href="{{ route('receptionist.dashboard') }}" class="nav-link text-white">AI Receptionist</a>
+            <a href="{{ route('appointments.index') }}" class="nav-link text-white">Appointments</a>
             <a href="{{ route('followups.index') }}" class="nav-link text-white">Follow-ups</a>
             <div class="text-uppercase text-secondary small fw-bold mt-3 mb-1">Customers</div>
             <a href="#" class="nav-link text-white">Appointments</a>
