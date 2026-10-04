@@ -32,7 +32,6 @@
             <a href="#" class="nav-link text-white">Appointments</a>
             <a href="#" class="nav-link text-white">Customers</a>
             <div class="text-uppercase text-secondary small fw-bold mt-3 mb-1">System</div>
-            <a href="#" class="nav-link text-white">AI Receptionist</a>
             <a href="#" class="nav-link text-white">Settings</a>
         </nav>
     </aside>
