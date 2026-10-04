@@ -16,10 +16,12 @@ class WebsiteResearchService
         );
 
         if (!$company->website) {
-            return $intel->updateOrCreate(
-                ['company_id' => $company->id],
-                ['research_status' => 'failed', 'research_summary' => 'No website is recorded for this company.']
-            );
+            $intel->update([
+                'research_status' => 'failed',
+                'research_summary' => 'No website is recorded for this company.',
+            ]);
+
+            return $intel->refresh();
         }
 
         try {
