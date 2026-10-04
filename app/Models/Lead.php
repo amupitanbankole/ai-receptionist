@@ -25,4 +25,5 @@ class Lead extends Model
     public function leadSource(): BelongsTo { return $this->belongsTo(LeadSource::class); }
     public function activities(): HasMany { return $this->hasMany(Activity::class); }
     public function followups(): HasMany { return $this->hasMany(Followup::class); }
+    public function aiPersonalizations(): HasMany { return $this->hasMany(AiPersonalization::class); }
 }
