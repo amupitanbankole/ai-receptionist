@@ -13,6 +13,7 @@ use Illuminate\Foundation\Queue\InteractsWithQueue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Throwable;
 
 class SendCampaignEmail implements ShouldQueue
@@ -50,6 +51,9 @@ class SendCampaignEmail implements ShouldQueue
 
         $subject = $renderer->render($step->subject, $recipient);
         $body = $renderer->render($step->body, $recipient);
+        $unsubscribeUrl = URL::signedRoute('campaign.unsubscribe', ['recipient' => $recipient->id]);
+        $footer = trim($campaign->unsubscribe_text ?: 'If you no longer want to receive these emails, unsubscribe here:') . "\\n" . $unsubscribeUrl;
+        $body .= "\\n\\n" . $footer;
 
         $message = Message::create([
             'campaign_recipient_id' => $recipient->id,
