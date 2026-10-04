@@ -15,16 +15,16 @@
 <h5 class="mb-3">Campaign</h5>
 <div class="mb-3"><label class="form-label">Name</label><input name="name" class="form-control" value="{{ old('name', $aiDraft ? 'AI Personalized Outreach' : '') }}" placeholder="Birmingham Cleaners — AI Receptionist" required></div>
 <div class="row">
-<div class="col-md-6 mb-3"><label class="form-label">Template</label><select name="template_id" class="form-select"><option value="">Custom campaign copy</option>@foreach($templates as $template)<option value="{{ $template->id }}" @selected(old('template_id')==$template->id)>{{ $template->name }}</option>@endforeach</select></div>
-<div class="col-md-6 mb-3"><label class="form-label">Daily sending limit</label><input type="number" name="daily_limit" class="form-control" value="{{ old('daily_limit',25) }}" min="1" max="1000" required></div>
+<div class="col-md-6 mb-3"><label class="form-label">Template</label><select name="template_id" class="form-select"><option value="">Custom campaign copy</option>@foreach($templates as $template)<option value="{{ $template->id }}" @selected(old('template_id') == $template->id)>{{ $template->name }}</option>@endforeach</select></div>
+<div class="col-md-6 mb-3"><label class="form-label">Daily sending limit</label><input type="number" name="daily_limit" class="form-control" value="{{ old('daily_limit', 25) }}" min="1" max="1000" required></div>
 </div>
-<div class="mb-3"><label class="form-label">Subject</label><input name="subject" class="form-control" value="{{ old('subject', $aiDraft['subject'] ?? '') }}" placeholder="Quick question for {{ '{{company_name}}' }}"></div>
-<div class="mb-3"><label class="form-label">Initial email body</label><textarea name="body" rows="12" class="form-control font-monospace" placeholder="Hi {{ '{{first_name}}' }},&#10;&#10;I noticed {{ '{{company_name}}' }} ...">{{ old('body', $aiDraft['body'] ?? '') }}</textarea></div>
+<div class="mb-3"><label class="form-label">Subject</label><input name="subject" class="form-control" value="{{ old('subject', $aiDraft['subject'] ?? '') }}" placeholder="Quick question for &#123;&#123;company_name&#125;&#125;"></div>
+<div class="mb-3"><label class="form-label">Initial email body</label><textarea name="body" rows="12" class="form-control font-monospace" placeholder="Hi &#123;&#123;first_name&#125;&#125;,&#10;&#10;I noticed &#123;&#123;company_name&#125;&#125; ...">{{ old('body', $aiDraft['body'] ?? '') }}</textarea></div>
 <div class="row">
 <div class="col-md-6 mb-3"><label class="form-label">Schedule</label><input type="datetime-local" name="scheduled_at" class="form-control" value="{{ old('scheduled_at') }}"></div>
 <div class="col-md-6 mb-3"><label class="form-label">Reply-to email</label><input type="email" name="reply_to" class="form-control" value="{{ old('reply_to') }}"></div>
 </div>
-<div class="mb-0"><label class="form-label">Unsubscribe text</label><textarea name="unsubscribe_text" rows="2" class="form-control">{{ old('unsubscribe_text','If you no longer want to receive these emails, use the unsubscribe link below.') }}</textarea></div>
+<div class="mb-0"><label class="form-label">Unsubscribe text</label><textarea name="unsubscribe_text" rows="2" class="form-control">{{ old('unsubscribe_text', 'If you no longer want to receive these emails, use the unsubscribe link below.') }}</textarea></div>
 </div></div>
 
 <div class="card border-0 shadow-sm"><div class="card-body">
@@ -34,7 +34,7 @@
 <table class="table table-sm align-middle"><thead><tr><th></th><th>Lead</th><th>Company</th><th>Contact</th><th>Email</th><th>Score</th></tr></thead>
 <tbody>
 @foreach($leads as $lead)
-@php($email=$lead->contact?->email ?: $lead->company?->email)
+@php($email = $lead->contact?->email ?: $lead->company?->email)
 @if($email)
 <tr>
 <td><input class="form-check-input" type="checkbox" name="lead_ids[]" value="{{ $lead->id }}" @checked(in_array($lead->id, old('lead_ids', $aiDraft ? [$aiDraft['lead_id']] : [])))></td>
@@ -42,7 +42,7 @@
 <td>{{ $lead->company->name }}</td>
 <td>{{ trim(($lead->contact?->first_name ?? '').' '.($lead->contact?->last_name ?? '')) ?: '—' }}</td>
 <td>{{ $email }}</td>
-<td><span class="badge text-bg-{{ $lead->temperature==='hot'?'danger':($lead->temperature==='high'?'warning':'secondary') }}">{{ $lead->score }}</span></td>
+<td><span class="badge text-bg-{{ $lead->temperature === 'hot' ? 'danger' : ($lead->temperature === 'high' ? 'warning' : 'secondary') }}">{{ $lead->score }}</span></td>
 </tr>
 @endif
 @endforeach
@@ -60,7 +60,7 @@
 <div class="card border-0 shadow-sm mb-4"><div class="card-body">
 <h5>Placeholders</h5>
 <p class="small text-muted">Use these placeholders in subject/body:</p>
-<div class="d-flex flex-wrap gap-2"><code>{{ '{{first_name}}' }}</code><code>{{ '{{company_name}}' }}</code><code>{{ '{{industry}}' }}</code><code>{{ '{{website}}' }}</code><code>{{ '{{city}}' }}</code><code>{{ '{{research_summary}}' }}</code><code>{{ '{{lead_title}}' }}</code></div>
+<div class="d-flex flex-wrap gap-2"><code>&#123;&#123;first_name&#125;&#125;</code><code>&#123;&#123;company_name&#125;&#125;</code><code>&#123;&#123;industry&#125;&#125;</code><code>&#123;&#123;website&#125;&#125;</code><code>&#123;&#123;city&#125;&#125;</code><code>&#123;&#123;research_summary&#125;&#125;</code><code>&#123;&#123;lead_title&#125;&#125;</code></div>
 </div></div>
 <div class="card border-0 shadow-sm"><div class="card-body">
 <h5>Before launch</h5>
