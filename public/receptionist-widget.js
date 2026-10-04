@@ -6,11 +6,12 @@
 
     var params = new URL(script.src).searchParams;
     var companyId = params.get('company_id');
+    var siteKey = params.get('site_key');
     var apiBase = params.get('api') || new URL(script.src).origin;
     var position = params.get('position') === 'left' ? 'left' : 'right';
 
-    if (!companyId) {
-        console.error('AI Receptionist widget: company_id is required.');
+    if (!companyId || !siteKey) {
+        console.error('AI Receptionist widget: company_id and site_key are required.');
         return;
     }
 
@@ -47,7 +48,7 @@
         '<header id="airw-header"><span id="airw-title">AI Receptionist</span><button id="airw-close" type="button" aria-label="Close">×</button></header>',
         '<div id="airw-messages"></div>',
         '<form id="airw-form">',
-        '<div id="airw-fields"><input id="airw-name" placeholder="Your name" required><input id="airw-email" type="email" placeholder="Email"></div>',
+        '<div id="airw-fields"><input id="airw-name" placeholder="Your name" required><input id="airw-email" type="email" placeholder="Email"><input id="airw-phone" type="tel" placeholder="Phone"></div>',
         '<div id="airw-booking"><label for="airw-date">Request an appointment (optional)</label><input id="airw-date" type="datetime-local"></div>',
         '<textarea id="airw-message" placeholder="How can we help?" required></textarea>',
         '<button id="airw-send" type="submit">Send message</button>',
@@ -81,7 +82,7 @@
     async function loadConfig() {
         try {
             var response = await fetch(apiBase + '/api/receptionist/widget?company_id=' + encodeURIComponent(companyId), {
-                headers: { 'Accept': 'application/json' }
+                headers: { 'Accept': 'application/json', 'X-Receptionist-Key': siteKey }
             });
             var data = await response.json();
             if (!response.ok || !data.enabled) throw new Error('Receptionist unavailable');
@@ -105,6 +106,7 @@
         var email = document.getElementById('airw-email').value.trim();
         var message = document.getElementById('airw-message').value.trim();
         var requestedStart = document.getElementById('airw-date').value;
+        var phone = document.getElementById('airw-phone')?.value.trim() || '';
 
         if (!name || !message) return;
 
@@ -115,16 +117,18 @@
         send.textContent = 'Thinking…';
 
         try {
-            var response = await fetch(apiBase + '/api/receptionist/chat', {
+            var response = await fetch(apiBase + '/api/receptionist/chat?company_id=' + encodeURIComponent(companyId), {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-Receptionist-Key': siteKey
                 },
                 body: JSON.stringify({
                     company_id: Number(companyId),
                     customer_name: name,
                     customer_email: email || null,
+                    customer_phone: phone || null,
                     message: message,
                     requested_start: requestedStart || null
                 })
