@@ -1,0 +1,10 @@
+@extends('layouts.app')
+@section('title','Simulate AI Receptionist')
+@section('page_title','Simulate Customer Conversation')
+@section('content')
+<div class="card"><div class="card-header fw-bold">Test AI receptionist</div><div class="card-body"><p class="text-muted">This creates a real CRM conversation and lead. If you provide a requested date/time, the system will attempt to book it.</p>
+@if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
+@if($result ?? null)<div class="alert alert-success"><strong>AI reply:</strong><br>{{ $result['message'] }} @if($result['appointment'])<hr><strong>Booked:</strong> {{ $result['appointment']->starts_at->format('D j M Y H:i') }} @endif</div>@endif
+<form method="POST" action="{{ route('receptionist.simulate.store') }}">@csrf<input type="hidden" name="company_id" value="{{ $company->id }}">
+<div class="row g-3"><div class="col-md-6"><label class="form-label">Customer name</label><input name="customer_name" class="form-control" value="{{ old('customer_name','John Smith') }}"></div><div class="col-md-6"><label class="form-label">Email</label><input name="customer_email" type="email" class="form-control" value="{{ old('customer_email','john@example.com') }}"></div><div class="col-md-6"><label class="form-label">Phone</label><input name="customer_phone" class="form-control"></div><div class="col-md-6"><label class="form-label">Requested appointment (optional)</label><input name="requested_start" type="datetime-local" class="form-control"></div><div class="col-12"><label class="form-label">Customer message</label><textarea name="message" class="form-control" rows="6" required>{{ old('message','Hi, I would like to book an appointment. What availability do you have?') }}</textarea></div></div><button class="btn btn-primary mt-3">Send to AI receptionist</button></form></div></div>
+@endsection
