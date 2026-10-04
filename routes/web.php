@@ -7,6 +7,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FollowupController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LeadScoringController;
+use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\EmailTemplateController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\CampaignUnsubscribeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -31,3 +35,16 @@ Route::patch('/discovery/{result}/discard', [\App\Http\Controllers\DiscoveryResu
 Route::get('/companies/{company}/research', [\App\Http\Controllers\CompanyResearchController::class, 'show'])->name('research.show');
 Route::post('/companies/{company}/research', [\App\Http\Controllers\CompanyResearchController::class, 'run'])->name('research.run');
 Route::patch('/companies/{company}/research', [\App\Http\Controllers\CompanyResearchController::class, 'update'])->name('research.update');
+
+Route::resource('campaigns', CampaignController::class)->only(['index','create','store','show']);
+Route::post('/campaigns/{campaign}/launch', [CampaignController::class, 'launch'])->name('campaigns.launch');
+Route::post('/campaigns/{campaign}/pause', [CampaignController::class, 'pause'])->name('campaigns.pause');
+Route::post('/campaigns/{campaign}/steps', [CampaignController::class, 'addStep'])->name('campaigns.steps.store');
+Route::delete('/campaigns/{campaign}/steps/{step}', [CampaignController::class, 'removeStep'])->name('campaigns.steps.destroy');
+
+Route::resource('email-templates', EmailTemplateController::class);
+Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+
+Route::get('/campaign-unsubscribe/{recipient}', CampaignUnsubscribeController::class)
+    ->middleware('signed')
+    ->name('campaign.unsubscribe');
