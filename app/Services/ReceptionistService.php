@@ -11,6 +11,7 @@ use App\Models\ReceptionistKnowledge;
 use App\Models\SalesConversation;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 class ReceptionistService
@@ -29,10 +30,59 @@ class ReceptionistService
                 'booking_enabled' => true,
                 'after_hours_message' => 'We are currently outside business hours, but I can take your details and arrange a follow-up.',
                 'timezone' => 'Europe/London',
+                'metadata' => [],
             ]
         );
+
+        $metadata = is_array($config->metadata) ? $config->metadata : [];
+        if (empty($metadata['widget_key'])) {
+            $metadata['widget_key'] = Str::random(40);
+            $config->metadata = $metadata;
+            $config->save();
+        }
+
         $this->appointments->ensureDefaults($company);
-        return $config;
+        return $config->fresh();
+    }
+
+    public function regenerateWidgetKey(Company $company)
+    {
+        $config = $this->ensureConfig($company);
+        $metadata = is_array($config->metadata) ? $config->metadata : [];
+        $metadata['widget_key'] = Str::random(40);
+        $config->metadata = $metadata;
+        $config->save();
+
+        return $config->fresh();
+    }
+
+    public function widgetKey($config): string
+    {
+        return (string) (($config->metadata ?? [])['widget_key'] ?? '');
+    }
+
+    public function allowedWidgetOrigins($config): array
+    {
+        $origins = (($config->metadata ?? [])['allowed_origins'] ?? []);
+        if (!is_array($origins)) return [];
+
+        return array_values(array_filter(array_map(function ($origin) {
+            $origin = trim((string) $origin);
+            if ($origin === '') return null;
+            return rtrim($origin, '/');
+        }, $origins)));
+    }
+
+    public function isWidgetOriginAllowed($config, ?string $origin): bool
+    {
+        $origin = $origin ? rtrim(trim($origin), '/') : '';
+        $allowed = $this->allowedWidgetOrigins($config);
+
+        if ($origin !== '' && in_array($origin, $allowed, true)) {
+            return true;
+        }
+
+        return $origin === '' && in_array(config('app.env'), ['local', 'testing'], true);
     }
 
     public function respond(Company $company, array $input): array
@@ -152,19 +202,28 @@ class ReceptionistService
         $result = null;
 
         if (config('services.openai.key')) {
-            $response = Http::withToken(config('services.openai.key'))->acceptJson()->timeout(90)
-                ->post('https://api.openai.com/v1/responses', [
-                    'model' => config('services.openai.model'),
-                    'instructions' => 'You are a careful AI receptionist for a UK local-service business. Answer only from supplied facts. Be concise, friendly and useful. Never invent prices, availability, guarantees or policies. Return only valid JSON with keys: intent, priority, reply, next_action, summary. intent must be one of enquiry, quote_request, booking_request, interested, complaint, escalation, unclear. priority must be low, normal, high, urgent.',
-                    'input' => $prompt,
-                ]);
-            if ($response->successful()) {
-                $raw = trim((string) $response->json('output_text'));
-                if (!$raw) {
-                    foreach ($response->json('output', []) as $item) foreach (($item['content'] ?? []) as $c) if (($c['type'] ?? '') === 'output_text') $raw .= ($c['text'] ?? '');
+            try {
+                $response = Http::withToken(config('services.openai.key'))->acceptJson()->timeout(90)
+                    ->post('https://api.openai.com/v1/responses', [
+                        'model' => config('services.openai.model'),
+                        'instructions' => 'You are a careful AI receptionist for a UK local-service business. Answer only from supplied facts. Be concise, friendly and useful. Never invent prices, availability, guarantees or policies. Return only valid JSON with keys: intent, priority, reply, next_action, summary. intent must be one of enquiry, quote_request, booking_request, interested, complaint, escalation, unclear. priority must be low, normal, high, urgent.',
+                        'input' => $prompt,
+                    ]);
+
+                if ($response->successful()) {
+                    $raw = trim((string) $response->json('output_text'));
+                    if (!$raw) {
+                        foreach ($response->json('output', []) as $item) {
+                            foreach (($item['content'] ?? []) as $c) {
+                                if (($c['type'] ?? '') === 'output_text') $raw .= ($c['text'] ?? '');
+                            }
+                        }
+                    }
+                    $decoded = json_decode(trim($raw), true);
+                    if (is_array($decoded) && !empty($decoded['reply'])) $result = $decoded;
                 }
-                $decoded = json_decode(trim($raw), true);
-                if (is_array($decoded) && !empty($decoded['reply'])) $result = $decoded;
+            } catch (\Throwable $e) {
+                report($e);
             }
         }
 
@@ -187,6 +246,7 @@ class ReceptionistService
                     $result['reply'] = 'You’re booked for '.Carbon::parse($appointment->starts_at)->format('l j F, H:i').'. We’ll use the contact details you provided for the confirmation.';
                     $result['next_action'] = 'Appointment booked and CRM updated.';
                 } catch (\Throwable $e) {
+                    report($e);
                     $slots = $this->appointments->slots($company, now($config->timezone), 7);
                     $result['reply'] = 'I can help with that. That exact time is not available. The next available options are: '.$this->formatSlots($slots).'.';
                     $result['next_action'] = 'Customer should choose an available slot.';
