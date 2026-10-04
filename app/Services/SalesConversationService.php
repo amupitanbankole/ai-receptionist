@@ -88,10 +88,6 @@ class SalesConversationService
             'occurred_at' => now(),
         ]);
 
-        if ($lead && $lead->status === 'new') {
-            $lead->update(['status' => 'qualified']);
-        }
-
         $this->generateReplySuggestion($conversation->fresh(), $message);
 
         return $conversation->fresh(['lead.company', 'contact', 'messages', 'aiReplySuggestions']);
@@ -169,6 +165,11 @@ class SalesConversationService
                 'summary' => $result['summary'] ?? null,
                 'status' => in_array($intent, ['not_interested', 'unsubscribe'], true) ? 'closed' : 'open',
             ]);
+
+            if ($conversation->lead && in_array($intent, ['interested', 'question', 'objection', 'meeting_request'], true)
+                && $conversation->lead->status === 'new') {
+                $conversation->lead->update(['status' => 'qualified']);
+            }
 
             if ($intent === 'unsubscribe' && $inbound->from_address) {
                 Suppression::updateOrCreate(
