@@ -8,15 +8,18 @@
 @csrf
 <div class="row g-4">
 <div class="col-lg-8">
+@if($aiDraft)
+<div class="alert alert-primary"><strong>AI draft loaded.</strong> Review the copy, select the intended lead(s), then create the campaign.</div>
+@endif
 <div class="card border-0 shadow-sm mb-4"><div class="card-body">
 <h5 class="mb-3">Campaign</h5>
-<div class="mb-3"><label class="form-label">Name</label><input name="name" class="form-control" value="{{ old('name') }}" placeholder="Birmingham Cleaners — AI Receptionist" required></div>
+<div class="mb-3"><label class="form-label">Name</label><input name="name" class="form-control" value="{{ old('name', $aiDraft ? 'AI Personalized Outreach' : '') }}" placeholder="Birmingham Cleaners — AI Receptionist" required></div>
 <div class="row">
 <div class="col-md-6 mb-3"><label class="form-label">Template</label><select name="template_id" class="form-select"><option value="">Custom campaign copy</option>@foreach($templates as $template)<option value="{{ $template->id }}" @selected(old('template_id')==$template->id)>{{ $template->name }}</option>@endforeach</select></div>
 <div class="col-md-6 mb-3"><label class="form-label">Daily sending limit</label><input type="number" name="daily_limit" class="form-control" value="{{ old('daily_limit',25) }}" min="1" max="1000" required></div>
 </div>
-<div class="mb-3"><label class="form-label">Subject</label><input name="subject" class="form-control" value="{{ old('subject') }}" placeholder="Quick question for {{ '{{company_name}}' }}"></div>
-<div class="mb-3"><label class="form-label">Initial email body</label><textarea name="body" rows="12" class="form-control font-monospace" placeholder="Hi {{ '{{first_name}}' }},&#10;&#10;I noticed {{ '{{company_name}}' }} ...">{{ old('body') }}</textarea></div>
+<div class="mb-3"><label class="form-label">Subject</label><input name="subject" class="form-control" value="{{ old('subject', $aiDraft['subject'] ?? '') }}" placeholder="Quick question for {{ '{{company_name}}' }}"></div>
+<div class="mb-3"><label class="form-label">Initial email body</label><textarea name="body" rows="12" class="form-control font-monospace" placeholder="Hi {{ '{{first_name}}' }},&#10;&#10;I noticed {{ '{{company_name}}' }} ...">{{ old('body', $aiDraft['body'] ?? '') }}</textarea></div>
 <div class="row">
 <div class="col-md-6 mb-3"><label class="form-label">Schedule</label><input type="datetime-local" name="scheduled_at" class="form-control" value="{{ old('scheduled_at') }}"></div>
 <div class="col-md-6 mb-3"><label class="form-label">Reply-to email</label><input type="email" name="reply_to" class="form-control" value="{{ old('reply_to') }}"></div>
@@ -34,7 +37,7 @@
 @php($email=$lead->contact?->email ?: $lead->company?->email)
 @if($email)
 <tr>
-<td><input class="form-check-input" type="checkbox" name="lead_ids[]" value="{{ $lead->id }}" @checked(in_array($lead->id, old('lead_ids',[])))></td>
+<td><input class="form-check-input" type="checkbox" name="lead_ids[]" value="{{ $lead->id }}" @checked(in_array($lead->id, old('lead_ids', $aiDraft ? [$aiDraft['lead_id']] : [])))></td>
 <td>{{ $lead->title }}</td>
 <td>{{ $lead->company->name }}</td>
 <td>{{ trim(($lead->contact?->first_name ?? '').' '.($lead->contact?->last_name ?? '')) ?: '—' }}</td>
@@ -50,7 +53,12 @@
 
 <div class="col-lg-4">
 <div class="card border-0 shadow-sm mb-4"><div class="card-body">
-<h5>Personalization</h5>
+<h5>AI Personalization</h5>
+<p class="small text-muted">Generate a prospect-specific draft from CRM and website research, then review it before sending.</p>
+<a href="{{ $aiDraft ? route('leads.show', $aiDraft['lead_id']) : route('leads.index') }}" class="btn btn-outline-primary w-100">{{ $aiDraft ? 'Review Source Lead' : 'Open Lead CRM' }}</a>
+</div></div>
+<div class="card border-0 shadow-sm mb-4"><div class="card-body">
+<h5>Placeholders</h5>
 <p class="small text-muted">Use these placeholders in subject/body:</p>
 <div class="d-flex flex-wrap gap-2"><code>{{ '{{first_name}}' }}</code><code>{{ '{{company_name}}' }}</code><code>{{ '{{industry}}' }}</code><code>{{ '{{website}}' }}</code><code>{{ '{{city}}' }}</code><code>{{ '{{research_summary}}' }}</code><code>{{ '{{lead_title}}' }}</code></div>
 </div></div>
@@ -60,6 +68,7 @@
 <li>Connect a real SMTP/Resend/Postmark mailer in <code>.env</code>.</li>
 <li>Keep daily limits conservative while domain reputation is established.</li>
 <li>Only contact appropriate prospects and honor opt-outs.</li>
+<li>Review AI-generated copy before sending.</li>
 </ul>
 <button class="btn btn-primary w-100">Create Campaign</button>
 <a href="{{ route('campaigns.index') }}" class="btn btn-link w-100 mt-2">Cancel</a>
