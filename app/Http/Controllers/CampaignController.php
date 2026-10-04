@@ -32,8 +32,9 @@ class CampaignController extends Controller
             ->get();
 
         $templates = EmailTemplate::where('is_active', true)->orderBy('name')->get();
+        $aiDraft = session('ai_campaign_draft');
 
-        return view('campaigns.create', compact('leads', 'templates'));
+        return view('campaigns.create', compact('leads', 'templates', 'aiDraft'));
     }
 
     public function store(Request $request, CampaignService $service): RedirectResponse
@@ -51,8 +52,8 @@ class CampaignController extends Controller
             'lead_ids.*' => ['integer','exists:leads,id'],
         ]);
 
-        if (!$validated['template_id'] && empty($validated['subject'])) {
-            return back()->withInput()->withErrors(['subject' => 'Provide a subject or select an email template.']);
+        if (!$validated['template_id'] && (empty($validated['subject']) || empty($validated['body']))) {
+            return back()->withInput()->withErrors(['subject' => 'Provide both a subject and email body, or select an email template.']);
         }
 
         if ($validated['template_id']) {
@@ -75,6 +76,7 @@ class CampaignController extends Controller
 
         $service->ensureDefaultSteps($campaign);
         $service->syncRecipients($campaign, Lead::whereIn('id', $validated['lead_ids'])->get());
+        session()->forget('ai_campaign_draft');
 
         return redirect()->route('campaigns.show', $campaign)->with('success', 'Campaign created with eligible recipients.');
     }
