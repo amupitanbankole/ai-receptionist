@@ -42,7 +42,7 @@ Route::post('/campaigns/{campaign}/pause', [CampaignController::class, 'pause'])
 Route::post('/campaigns/{campaign}/steps', [CampaignController::class, 'addStep'])->name('campaigns.steps.store');
 Route::delete('/campaigns/{campaign}/steps/{step}', [CampaignController::class, 'removeStep'])->name('campaigns.steps.destroy');
 
-Route::resource('email-templates', EmailTemplateController::class);
+Route::resource('email-templates', EmailTemplateController::class)->only(['index','create','store','edit','update','destroy']);
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 
 Route::get('/campaign-unsubscribe/{recipient}', CampaignUnsubscribeController::class)
