@@ -45,19 +45,19 @@
                 Leads
             </a>
 
-            <a href="#" class="nav-link text-white">
+            <a href="{{ route('lead-scoring.index') }}" class="nav-link text-white">
                 Lead Scoring
             </a>
 
-            <a href="#" class="nav-link text-white">
+            <a href="{{ route('campaigns.index') }}" class="nav-link text-white">
                 Campaigns
             </a>
 
-            <a href="#" class="nav-link text-white">
+            <a href="{{ route('messages.index') }}" class="nav-link text-white">
                 Messages
             </a>
 
-            <a href="#" class="nav-link text-white">
+            <a href="{{ route('followups.index') }}" class="nav-link text-white">
                 Follow-ups
             </a>
 
