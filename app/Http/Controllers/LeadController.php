@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Lead;
+use App\Models\LeadSource;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -12,7 +13,7 @@ class LeadController extends Controller
 {
     public function index(): View
     {
-        $leads = Lead::with(['company', 'contact'])
+        $leads = Lead::with(['company', 'contact', 'leadSource'])
             ->latest()
             ->paginate(20);
 
@@ -23,8 +24,9 @@ class LeadController extends Controller
     {
         $companies = Company::orderBy('name')->get();
         $contacts = Contact::orderBy('first_name')->get();
+        $leadSources = LeadSource::where('is_active', true)->orderBy('name')->get();
 
-        return view('leads.create', compact('companies', 'contacts'));
+        return view('leads.create', compact('companies', 'contacts', 'leadSources'));
     }
 
     public function store(Request $request)
@@ -32,6 +34,7 @@ class LeadController extends Controller
         $validated = $request->validate([
             'company_id' => ['required', 'exists:companies,id'],
             'contact_id' => ['nullable', 'exists:contacts,id'],
+            'lead_source_id' => ['nullable', 'exists:lead_sources,id'],
             'title' => ['required', 'string', 'max:255'],
             'status' => ['required', 'in:new,qualified,demo,customer,lost'],
             'score' => ['nullable', 'integer', 'min:0', 'max:100'],
@@ -52,7 +55,7 @@ class LeadController extends Controller
 
     public function show(Lead $lead): View
     {
-        $lead->load(['company', 'contact']);
+        $lead->load(['company', 'contact', 'leadSource']);
 
         return view('leads.show', compact('lead'));
     }
@@ -61,8 +64,9 @@ class LeadController extends Controller
     {
         $companies = Company::orderBy('name')->get();
         $contacts = Contact::orderBy('first_name')->get();
+        $leadSources = LeadSource::where('is_active', true)->orderBy('name')->get();
 
-        return view('leads.edit', compact('lead', 'companies', 'contacts'));
+        return view('leads.edit', compact('lead', 'companies', 'contacts', 'leadSources'));
     }
 
     public function update(Request $request, Lead $lead)
@@ -70,6 +74,7 @@ class LeadController extends Controller
         $validated = $request->validate([
             'company_id' => ['required', 'exists:companies,id'],
             'contact_id' => ['nullable', 'exists:contacts,id'],
+            'lead_source_id' => ['nullable', 'exists:lead_sources,id'],
             'title' => ['required', 'string', 'max:255'],
             'status' => ['required', 'in:new,qualified,demo,customer,lost'],
             'score' => ['required', 'integer', 'min:0', 'max:100'],
