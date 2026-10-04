@@ -7,6 +7,7 @@ use App\Models\AppointmentType;
 use App\Models\BusinessAvailability;
 use App\Models\Company;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 use RuntimeException;
 
 class AppointmentService
@@ -85,21 +86,22 @@ class AppointmentService
 
         if (!$type) throw new RuntimeException('No active appointment type is configured.');
 
-        $start = Carbon::parse($data['starts_at'], $data['timezone'] ?? ($company->receptionistConfig?->timezone ?: 'Europe/London'));
+        $timezone = $data['timezone'] ?? ($company->receptionistConfig?->timezone ?: 'Europe/London');
+        $start = Carbon::parse($data['starts_at'], $timezone);
         $end = $start->copy()->addMinutes($type->duration_minutes);
 
         if (!$this->isAvailable($company, $start, $end)) {
             throw new RuntimeException('That appointment slot is no longer available.');
         }
 
-        return Appointment::create([
+        $appointment = Appointment::create([
             'company_id' => $company->id,
             'contact_id' => $data['contact_id'] ?? null,
             'lead_id' => $data['lead_id'] ?? null,
             'appointment_type_id' => $type->id,
             'starts_at' => $start,
             'ends_at' => $end,
-            'timezone' => $data['timezone'] ?? ($company->receptionistConfig?->timezone ?: 'Europe/London'),
+            'timezone' => $timezone,
             'customer_name' => $data['customer_name'],
             'customer_email' => $data['customer_email'] ?? null,
             'customer_phone' => $data['customer_phone'] ?? null,
@@ -108,5 +110,22 @@ class AppointmentService
             'notes' => $data['notes'] ?? null,
             'metadata' => $data['metadata'] ?? null,
         ]);
+
+        $config = $company->receptionistConfig;
+        if ($config?->notification_email) {
+            Mail::raw(
+                "New appointment for {$company->name}\n\nCustomer: {$appointment->customer_name}\nEmail: ".($appointment->customer_email ?: 'Not provided')."\nPhone: ".($appointment->customer_phone ?: 'Not provided')."\nWhen: ".$appointment->starts_at->format('l j F Y H:i')."\nType: ".$type->name,
+                fn ($mail) => $mail->to($config->notification_email)->subject('New AI Receptionist appointment')
+            );
+        }
+        if ($appointment->customer_email) {
+            Mail::raw(
+                "Your appointment with {$company->name} is confirmed for ".$appointment->starts_at->format('l j F Y H:i').".\n\nIf you need to change it, please contact the business.",
+                fn ($mail) => $mail->to($appointment->customer_email)->subject('Appointment confirmation — '.$company->name)
+            );
+            $appointment->update(['confirmation_sent_at' => now()]);
+        }
+
+        return $appointment;
     }
 }
