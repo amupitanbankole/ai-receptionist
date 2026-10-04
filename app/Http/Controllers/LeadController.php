@@ -1,12 +1,12 @@
 <?php
 
-namespace AppHttpControllers;
+namespace App\Http\Controllers;
 
-use AppModelsCompany;
-use AppModelsContact;
-use AppModelsLead;
-use IlluminateHttpRequest;
-use IlluminateViewView;
+use App\Models\Company;
+use App\Models\Contact;
+use App\Models\Lead;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class LeadController extends Controller
 {
