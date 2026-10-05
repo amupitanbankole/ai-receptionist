@@ -203,7 +203,9 @@ class ReceptionistService
 
         if (config('services.openai.key')) {
             try {
-                $response = Http::withToken(config('services.openai.key'))->acceptJson()->timeout(90)
+                $response = Http::withToken(config('services.openai.key'))->acceptJson()
+                    ->connectTimeout(5)
+                    ->timeout(15)
                     ->post('https://api.openai.com/v1/responses', [
                         'model' => config('services.openai.model'),
                         'instructions' => 'You are a careful AI receptionist for a UK local-service business. Answer only from supplied facts. Be concise, friendly and useful. Never invent prices, availability, guarantees or policies. Return only valid JSON with keys: intent, priority, reply, next_action, summary. intent must be one of enquiry, quote_request, booking_request, interested, complaint, escalation, unclear. priority must be low, normal, high, urgent.',
