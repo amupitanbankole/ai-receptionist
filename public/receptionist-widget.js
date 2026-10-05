@@ -45,7 +45,7 @@
         '</style>',
         '<button id="airw-launcher" type="button">Chat with us</button>',
         '<section id="airw-panel" aria-label="AI Receptionist chat">',
-        '<header id="airw-header"><span id="airw-title">AI Receptionist</span><button id="airw-close" type="button" aria-label="Close">×</button></header>',
+        '<header id="airw-header"><span id="airw-title">AI Receptionist</span><button id="airw-close" type="button" aria-label="Close">&#215;</button></header>',
         '<div id="airw-messages"></div>',
         '<form id="airw-form">',
         '<div id="airw-fields"><input id="airw-name" placeholder="Your name" required><input id="airw-email" type="email" placeholder="Email"><input id="airw-phone" type="tel" placeholder="Phone"></div>',
