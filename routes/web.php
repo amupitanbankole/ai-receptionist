@@ -1,22 +1,24 @@
 <?php
 
-use App\Http\Controllers\ActivityController;
-use App\Http\Controllers\AiPersonalizationController;
-use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\FollowupController;
-use App\Http\Controllers\LeadController;
-use App\Http\Controllers\LeadScoringController;
-use App\Http\Controllers\CampaignController;
-use App\Http\Controllers\EmailTemplateController;
-use App\Http\Controllers\MessageController;
-use App\Http\Controllers\CampaignUnsubscribeController;
-use App\Http\Controllers\SalesConversationController;
-use App\Http\Controllers\ReceptionistController;
-use App\Http\Controllers\ReceptionistSimulationController;
-use App\Http\Controllers\AppointmentController;
-use Illuminate\Support\Facades\Route;
+use App\\Http\\Controllers\\ActivityController;
+use App\\Http\\Controllers\\AiPersonalizationController;
+use App\\Http\\Controllers\\CompanyController;
+use App\\Http\\Controllers\\ContactController;
+use App\\Http\\Controllers\\DashboardController;
+use App\\Http\\Controllers\\FollowupController;
+use App\\Http\\Controllers\\LeadController;
+use App\\Http\\Controllers\\LeadScoringController;
+use App\\Http\\Controllers\\CampaignController;
+use App\\Http\\Controllers\\EmailTemplateController;
+use App\\Http\\Controllers\\MessageController;
+use App\\Http\\Controllers\\CampaignUnsubscribeController;
+use App\\Http\\Controllers\\SalesConversationController;
+use App\\Http\\Controllers\\ReceptionistController;
+use App\\Http\\Controllers\\ReceptionistSimulationController;
+use App\\Http\\Controllers\\AppointmentController;
+use App\\Http\\Controllers\\UnclaimedFundsDashboardController;
+use App\\Http\\Controllers\\UnclaimedFundsProspectController;
+use Illuminate\\Support\\Facades\\Route;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -32,13 +34,13 @@ Route::resource('activities', ActivityController::class)->only(['index','create'
 Route::resource('followups', FollowupController::class)->only(['index','create','store']);
 Route::patch('/followups/{followup}/complete', [FollowupController::class, 'complete'])->name('followups.complete');
 
-Route::resource('discovery', \App\Http\Controllers\DiscoveryResultController::class)->only(['index','create','store']);
-Route::post('/discovery/import', [\App\Http\Controllers\DiscoveryResultController::class, 'import'])->name('discovery.import');
-Route::post('/discovery/{result}/promote', [\App\Http\Controllers\DiscoveryResultController::class, 'promote'])->name('discovery.promote');
-Route::patch('/discovery/{result}/discard', [\App\Http\Controllers\DiscoveryResultController::class, 'discard'])->name('discovery.discard');
-Route::get('/companies/{company}/research', [\App\Http\Controllers\CompanyResearchController::class, 'show'])->name('research.show');
-Route::post('/companies/{company}/research', [\App\Http\Controllers\CompanyResearchController::class, 'run'])->name('research.run');
-Route::patch('/companies/{company}/research', [\App\Http\Controllers\CompanyResearchController::class, 'update'])->name('research.update');
+Route::resource('discovery', \\App\\Http\\Controllers\\DiscoveryResultController::class)->only(['index','create','store']);
+Route::post('/discovery/import', [\\App\\Http\\Controllers\\DiscoveryResultController::class, 'import'])->name('discovery.import');
+Route::post('/discovery/{result}/promote', [\\App\\Http\\Controllers\\DiscoveryResultController::class, 'promote'])->name('discovery.promote');
+Route::patch('/discovery/{result}/discard', [\\App\\Http\\Controllers\\DiscoveryResultController::class, 'discard'])->name('discovery.discard');
+Route::get('/companies/{company}/research', [\\App\\Http\\Controllers\\CompanyResearchController::class, 'show'])->name('research.show');
+Route::post('/companies/{company}/research', [\\App\\Http\\Controllers\\CompanyResearchController::class, 'run'])->name('research.run');
+Route::patch('/companies/{company}/research', [\\App\\Http\\Controllers\\CompanyResearchController::class, 'update'])->name('research.update');
 
 Route::get('/leads/{lead}/ai-personalization', [AiPersonalizationController::class, 'show'])->name('ai-personalization.show');
 Route::post('/leads/{lead}/ai-personalization/generate', [AiPersonalizationController::class, 'generate'])->name('ai-personalization.generate');
@@ -80,3 +82,9 @@ Route::get('/messages', [MessageController::class, 'index'])->name('messages.ind
 Route::get('/campaign-unsubscribe/{recipient}', CampaignUnsubscribeController::class)
     ->middleware('signed')
     ->name('campaign.unsubscribe');
+
+// Sensitive lead-generation records are inaccessible unless an authenticated operator ID is allowlisted.
+Route::middleware('leadgen.access')->prefix('unclaimed-funds')->name('unclaimed-funds.')->group(function () {
+    Route::get('/', [UnclaimedFundsDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/prospects', [UnclaimedFundsProspectController::class, 'index'])->name('prospects.index');
+});
