@@ -15,7 +15,7 @@
             'Prospects' => $metrics['prospects'],
             'Verified property records' => $metrics['verified_records'],
             'Prospects with verified consent' => $metrics['consented_prospects'],
-            'Currently eligible numbers' => $metrics['eligible_numbers'],
+            'Recent eligibility decisions' => $metrics['eligible_numbers'],
             'Confirmed appointments' => $metrics['appointments'],
             'Verified active buyers' => $metrics['active_buyers'],
         ] as $label => $value)
