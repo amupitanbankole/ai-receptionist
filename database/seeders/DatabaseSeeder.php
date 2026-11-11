@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             LeadSourceSeeder::class,
             EmailTemplateSeeder::class,
+            UnclaimedFundsStateSeeder::class,
         ]);
     }
 }
