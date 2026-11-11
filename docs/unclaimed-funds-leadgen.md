@@ -8,14 +8,14 @@ This module adds a compliance-first foundation to the existing Laravel CRM.
 - Official property-source directory and public-record provenance.
 - Prospect and property-record tables.
 - Buyer directory and state-specific authorization records.
-- Buyer-specific consent evidence, revocation timestamps and DNC suppressions.
+- Caller-and-buyer-specific consent evidence, revocation timestamps, internal DNC suppressions and time-limited federal/state DNC screening evidence.
 - Calling eligibility decisions with reason codes and evidence snapshots.
 - Campaign, call-attempt, appointment, lead-delivery and audit tables.
 - A protected dashboard and prospect listing.
 
 ## Safety defaults
 
-- Every new state's `calling_status` defaults to `blocked`.
+- Every new state's `calling_status` and `finder_status` default to `blocked` / `review_required`.
 - Every buyer defaults to inactive and unverified.
 - Consent defaults to pending verification.
 - Calling eligibility defaults to blocked.
@@ -34,7 +34,7 @@ LEADGEN_ALLOWED_USER_IDS=1
 LEADGEN_OUTBOUND_AI_CALLING_ENABLED=false
 ```
 
-An empty allowlist denies access. Do not enable outbound calling merely by changing the environment variable. Obtain US legal review, configure consent collection, DNC screening, calling-hour restrictions, recording disclosures and state/buyer authorization verification first.
+An empty allowlist denies access. Do not enable outbound calling merely by changing the environment variable. Obtain US legal review, configure consent collection, federal and state DNC screening, calling-hour restrictions, recording disclosures and state/buyer authorization verification first. Federal and state DNC screening evidence must be current; missing or expired results block eligibility.
 
 ## Migrations
 
