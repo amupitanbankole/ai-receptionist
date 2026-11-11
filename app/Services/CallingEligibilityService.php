@@ -1,12 +1,12 @@
 <?php
 
-namespace App\\Services;
+namespace App\Services;
 
-use App\\Models\\Buyer;
-use App\\Models\\CallingEligibility;
-use App\\Models\\DncSuppression;
-use App\\Models\\Prospect;
-use Illuminate\\Support\\Carbon;
+use App\Models\Buyer;
+use App\Models\CallingEligibility;
+use App\Models\DncSuppression;
+use App\Models\Prospect;
+use Illuminate\Support\Carbon;
 
 class CallingEligibilityService
 {
