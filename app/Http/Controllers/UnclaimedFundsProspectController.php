@@ -1,10 +1,10 @@
 <?php
 
-namespace App\\Http\\Controllers;
+namespace App\Http\Controllers;
 
-use App\\Models\\Prospect;
-use Illuminate\\Http\\Request;
-use Illuminate\\View\\View;
+use App\Models\Prospect;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class UnclaimedFundsProspectController extends Controller
 {
