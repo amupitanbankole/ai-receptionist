@@ -16,6 +16,8 @@ use App\Http\Controllers\SalesConversationController;
 use App\Http\Controllers\ReceptionistController;
 use App\Http\Controllers\ReceptionistSimulationController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\UnclaimedFundsDashboardController;
+use App\Http\Controllers\UnclaimedFundsProspectController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -80,3 +82,9 @@ Route::get('/messages', [MessageController::class, 'index'])->name('messages.ind
 Route::get('/campaign-unsubscribe/{recipient}', CampaignUnsubscribeController::class)
     ->middleware('signed')
     ->name('campaign.unsubscribe');
+
+// Sensitive lead-generation records are inaccessible unless an authenticated operator ID is allowlisted.
+Route::middleware('leadgen.access')->prefix('unclaimed-funds')->name('unclaimed-funds.')->group(function () {
+    Route::get('/', [UnclaimedFundsDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/prospects', [UnclaimedFundsProspectController::class, 'index'])->name('prospects.index');
+});

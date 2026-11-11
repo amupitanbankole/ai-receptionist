@@ -1,0 +1,67 @@
+# Unclaimed Funds Lead Generation Module
+
+This module adds a compliance-first foundation to the existing Laravel CRM.
+
+## Current scope
+
+- Multi-state jurisdiction registry with finder and calling review statuses.
+- Official property-source directory and public-record provenance.
+- Prospect and property-record tables.
+- Buyer directory and state-specific authorization records.
+- Caller-and-buyer-specific consent evidence, revocation timestamps, internal DNC suppressions and time-limited federal/state DNC screening evidence.
+- Calling eligibility decisions with reason codes and evidence snapshots.
+- Campaign, call-attempt, appointment, lead-delivery and audit tables.
+- A protected dashboard and prospect listing.
+
+## Safety defaults
+
+- Every new state's `calling_status` and `finder_status` default to `blocked` / `review_required`.
+- Every buyer defaults to inactive and unverified.
+- Consent defaults to pending verification.
+- Calling eligibility defaults to blocked.
+- Campaigns default to draft.
+- `LEADGEN_OUTBOUND_AI_CALLING_ENABLED` defaults to false.
+- The UI is protected by an operator allowlist. Until configured, access is denied.
+- Public government records are not treated as consent to AI telemarketing.
+- A call eligibility decision is an evaluation only; it never starts a telephone call. Re-evaluate immediately before every call because consent and suppression status can change.
+
+## Access configuration
+
+Configure Laravel authentication first. Then add the authenticated operator user IDs to `.env`:
+
+```dotenv
+LEADGEN_ALLOWED_USER_IDS=1
+LEADGEN_CALLING_ENTITY_LEGAL_NAME=Your Agency Legal Name
+LEADGEN_OUTBOUND_AI_CALLING_ENABLED=false
+```
+
+An empty allowlist denies access. Do not enable outbound calling merely by changing the environment variable. Obtain US legal review, configure consent collection, federal and state DNC screening, calling-hour restrictions, recording disclosures and state/buyer authorization verification first. Federal and state DNC screening evidence must be current; missing or expired results block eligibility.
+
+## Initial setup
+
+The state seeder adds all 50 US states with finder review required and calling blocked:
+
+```bash
+php artisan db:seed --class=UnclaimedFundsStateSeeder
+```
+
+The lead-generation routes return HTTP 403 until Laravel authentication is configured and an authenticated operator ID is allowlisted. This repository's existing login/authentication setup must be completed before production use.
+
+## Migrations
+
+Run:
+
+```bash
+php artisan migrate
+```
+
+## Routes
+
+- `/unclaimed-funds` — dashboard
+- `/unclaimed-funds/prospects` — prospect research records
+
+Both routes require the `leadgen.access` middleware.
+
+## Important implementation boundary
+
+The first release intentionally does not include public-record scraping, automated cold calling, phone-number enrichment, or lead resale. Add data ingestion only for sources whose terms permit the method used. Add contact acquisition only through legally reviewed consent flows. Share a prospect with a buyer only after the prospect has explicitly authorized that specific disclosure.
