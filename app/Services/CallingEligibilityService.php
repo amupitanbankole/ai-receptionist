@@ -64,12 +64,13 @@ class CallingEligibilityService
                 ->where('calling_entity_legal_name', $callingEntity)
                 ->where('named_seller_legal_name', $buyer->legal_name)
                 ->where('consent_scope', 'ai_voice_telemarketing')
-                ->where('verification_status', 'verified')
-                ->whereNotNull('captured_at')
-                ->whereNull('revoked_at')
                 ->latest('captured_at')
                 ->first()
             : null;
+
+        if ($consent && ($consent->verification_status !== 'verified' || !$consent->captured_at || $consent->revoked_at)) {
+            $consent = null;
+        }
 
         if ($callingEntity === '') {
             $reasons[] = 'calling_entity_legal_name_not_configured';
@@ -94,13 +95,17 @@ class CallingEligibilityService
             $screening = DncScreening::query()
                 ->where('phone_e164', $phoneE164)
                 ->where('screening_type', $screeningType)
-                ->whereIn('status', ['clear', 'not_required'])
-                ->whereNotNull('checked_at')
-                ->where('expires_at', '>', $now)
                 ->latest('checked_at')
                 ->first();
 
-            if (!$screening || ($screeningType === 'federal_dnc' && $screening->status !== 'clear')) {
+            $screeningIsClear = $screening
+                && in_array($screening->status, ['clear', 'not_required'], true)
+                && $screening->checked_at
+                && $screening->expires_at
+                && $screening->expires_at->isFuture()
+                && !($screeningType === 'federal_dnc' && $screening->status !== 'clear');
+
+            if (!$screeningIsClear) {
                 $reasons[] = $screeningType . '_screening_missing_or_expired';
             }
         }
