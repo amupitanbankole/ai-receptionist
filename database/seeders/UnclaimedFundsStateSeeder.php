@@ -26,7 +26,7 @@ class UnclaimedFundsStateSeeder extends Seeder
         ];
 
         foreach ($states as $code => $name) {
-            UsState::updateOrCreate(
+            UsState::firstOrCreate(
                 ['code' => $code],
                 [
                     'name' => $name,
