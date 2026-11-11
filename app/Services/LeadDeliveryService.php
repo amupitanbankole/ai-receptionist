@@ -23,7 +23,7 @@ class LeadDeliveryService
             throw ValidationException::withMessages(['appointment' => 'The prospect has not confirmed this appointment.']);
         }
 
-        if (!$appointment->data_sharing_consent_at || !$appointment->data_sharing_consent_version) {
+        if (!$appointment->data_sharing_consent_at || !$appointment->data_sharing_consent_version || $appointment->data_sharing_consent_buyer_legal_name !== $buyer->legal_name) {
             throw ValidationException::withMessages(['consent' => 'The prospect has not explicitly authorized sharing this appointment with this buyer.']);
         }
 
