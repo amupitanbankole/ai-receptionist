@@ -1,13 +1,13 @@
 <?php
 
-namespace App\\Http\\Controllers;
+namespace App\Http\Controllers;
 
-use App\\Models\\Buyer;
-use App\\Models\\CallingEligibility;
-use App\\Models\\Prospect;
-use App\\Models\\PropertyRecord;
-use App\\Models\\RecoveryAppointment;
-use Illuminate\\View\\View;
+use App\Models\Buyer;
+use App\Models\CallingEligibility;
+use App\Models\Prospect;
+use App\Models\PropertyRecord;
+use App\Models\RecoveryAppointment;
+use Illuminate\View\View;
 
 class UnclaimedFundsDashboardController extends Controller
 {
