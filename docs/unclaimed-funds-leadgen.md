@@ -31,6 +31,7 @@ Configure Laravel authentication first. Then add the authenticated operator user
 
 ```dotenv
 LEADGEN_ALLOWED_USER_IDS=1
+LEADGEN_CALLING_ENTITY_LEGAL_NAME=Your Agency Legal Name
 LEADGEN_OUTBOUND_AI_CALLING_ENABLED=false
 ```
 
