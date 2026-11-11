@@ -28,9 +28,9 @@
             <a href="{{ route('receptionist.dashboard') }}" class="nav-link text-white">AI Receptionist</a>
             <a href="{{ route('appointments.index') }}" class="nav-link text-white">Appointments</a>
             <a href="{{ route('followups.index') }}" class="nav-link text-white">Follow-ups</a>
-            <div class="text-uppercase text-secondary small fw-bold mt-3 mb-1">Customers</div>
-            <a href="#" class="nav-link text-white">Appointments</a>
-            <a href="#" class="nav-link text-white">Customers</a>
+            <div class="text-uppercase text-secondary small fw-bold mt-3 mb-1">Unclaimed Funds</div>
+            <a href="{{ route('unclaimed-funds.dashboard') }}" class="nav-link text-white">Lead Generation</a>
+            <a href="{{ route('unclaimed-funds.prospects.index') }}" class="nav-link text-white">Prospects</a>
             <div class="text-uppercase text-secondary small fw-bold mt-3 mb-1">System</div>
             <a href="#" class="nav-link text-white">Settings</a>
         </nav>
