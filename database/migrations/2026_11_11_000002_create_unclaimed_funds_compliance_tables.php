@@ -43,6 +43,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('prospect_id')->constrained()->cascadeOnDelete();
             $table->string('phone_e164', 20);
+            $table->string('calling_entity_legal_name');
             $table->string('named_seller_legal_name');
             $table->string('consent_scope');
             $table->string('consent_method');
