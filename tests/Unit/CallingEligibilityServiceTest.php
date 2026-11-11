@@ -3,6 +3,9 @@
 namespace Tests\Unit;
 
 use App\Models\Buyer;
+use App\Models\BuyerAuthorization;
+use App\Models\ConsentRecord;
+use App\Models\DncScreening;
 use App\Models\Prospect;
 use App\Models\UsState;
 use App\Services\CallingEligibilityService;
@@ -77,6 +80,7 @@ class CallingEligibilityServiceTest extends TestCase
         $this->assertSame('blocked', $decision->decision);
         $this->assertContains('outbound_ai_calling_globally_disabled', $decision->reason_codes);
     }
+
     public function test_latest_blocked_dnc_result_overrides_an_older_clear_result(): void
     {
         config(['leadgen.outbound_ai_calling_enabled' => true]);
@@ -149,5 +153,4 @@ class CallingEligibilityServiceTest extends TestCase
         $this->assertSame('blocked', $decision->decision);
         $this->assertContains('federal_dnc_screening_missing_or_expired', $decision->reason_codes);
     }
-
 }
