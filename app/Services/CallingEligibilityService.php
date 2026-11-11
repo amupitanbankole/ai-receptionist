@@ -19,6 +19,10 @@ class CallingEligibilityService
     {
         $reasons = [];
         $state = $prospect->state;
+
+        if (!config('leadgen.outbound_ai_calling_enabled', false)) {
+            $reasons[] = 'outbound_ai_calling_globally_disabled';
+        }
         $now = now();
 
         if (!$state || $state->calling_status !== 'approved') {
