@@ -40,6 +40,7 @@ return new class extends Migration
             $table->string('buyer_meeting_reference')->nullable();
             $table->timestamp('prospect_confirmed_at')->nullable();
             $table->timestamp('data_sharing_consent_at')->nullable();
+            $table->string('data_sharing_consent_buyer_legal_name')->nullable();
             $table->string('data_sharing_consent_version')->nullable();
             $table->timestamp('shared_with_buyer_at')->nullable();
             $table->decimal('agreed_lead_price', 10, 2)->nullable();
